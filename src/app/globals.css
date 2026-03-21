@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #0a0a0a;
+  --color-foreground: #e4e4e7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-900: #064e3b;
+  --color-zinc-800: #27272a;
+  --color-zinc-900: #18181b;
+  --color-zinc-950: #09090b;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #27272a transparent;
+}
+
+body {
+  background: #050505;
+  color: #e4e4e7;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Noise texture overlay */
+.noise-bg {
+  position: relative;
+}
+.noise-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Code editor textarea */
+.code-textarea {
+  background: #0d0d0d;
+  border: 1px solid #27272a;
+  font-family: var(--font-mono), "Fira Code", "JetBrains Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: none;
+  transition: border-color 0.2s;
+}
+.code-textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+}
+.code-textarea::placeholder {
+  color: #3f3f46;
+}
+
+/* Glow effects */
+.glow-emerald {
+  box-shadow: 0 0 60px rgba(16, 185, 129, 0.08);
+}
+
+/* Terminal cursor blink */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Markdown output styling */
+.doc-output h1 { font-size: 1.5rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #34d399; }
+.doc-output h2 { font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #34d399; }
+.doc-output h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.25rem; color: #a7f3d0; }
+.doc-output p { margin: 0.5rem 0; line-height: 1.7; }
+.doc-output code { background: #18181b; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; color: #34d399; font-family: var(--font-mono), monospace; }
+.doc-output pre { background: #0d0d0d; border: 1px solid #27272a; border-radius: 8px; padding: 1rem; overflow-x: auto; margin: 0.75rem 0; }
+.doc-output pre code { background: transparent; padding: 0; color: #e4e4e7; }
+.doc-output ul, .doc-output ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+.doc-output li { margin: 0.25rem 0; }
+.doc-output blockquote { border-left: 3px solid #10b981; padding-left: 1rem; color: #a1a1aa; margin: 0.75rem 0; }
