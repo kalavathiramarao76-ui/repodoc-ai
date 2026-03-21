@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Copy, Check, Loader2, Sparkles, RotateCcw } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import FavoriteButton from "@/components/FavoriteButton";
+import ExportMenu from "@/components/ExportMenu";
 
 interface DocToolProps {
   title: string;
@@ -188,22 +190,30 @@ export default function DocTool({
               </span>
             </div>
             {output && (
-              <button
-                onClick={handleCopy}
-                className="text-xs text-zinc-600 hover:text-emerald-400 font-mono flex items-center gap-1 transition-colors"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3 h-3" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" />
-                    Copy
-                  </>
-                )}
-              </button>
+              <div className="flex items-center gap-1">
+                <FavoriteButton
+                  itemId={`repodoc-${mode}`}
+                  itemLabel={title}
+                  size="sm"
+                />
+                <ExportMenu content={output} title={`${title} — RepoDoc AI Report`} />
+                <button
+                  onClick={handleCopy}
+                  className="text-xs text-zinc-600 hover:text-emerald-400 font-mono flex items-center gap-1 transition-colors ml-1"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3 h-3" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      Copy
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </div>
 

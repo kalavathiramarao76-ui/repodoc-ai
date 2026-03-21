@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,9 +12,11 @@ import {
   ArrowRightLeft,
   Terminal,
   ArrowLeft,
+  Star,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { getFavoritesCount } from "@/components/FavoriteButton";
 
 const navItems = [
   { icon: FileCode2, label: "Documenter", href: "/app/document" },
@@ -26,6 +29,14 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [favCount, setFavCount] = useState(0);
+
+  useEffect(() => {
+    setFavCount(getFavoritesCount());
+    const handler = () => setFavCount(getFavoritesCount());
+    window.addEventListener("favorites-changed", handler);
+    return () => window.removeEventListener("favorites-changed", handler);
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -58,6 +69,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+
+          {favCount > 0 && (
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-mono text-[var(--color-text-secondary)]">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span>Favorites</span>
+              <span className="ml-auto px-2 py-0.5 rounded-full text-[11px] font-mono bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                {favCount}
+              </span>
+            </div>
+          )}
         </nav>
         <div className="p-4 border-t border-[var(--color-border)] space-y-2">
           <ThemeToggle />
