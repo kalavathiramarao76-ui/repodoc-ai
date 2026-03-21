@@ -12,6 +12,8 @@ import {
   Terminal,
   ArrowLeft,
 } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const navItems = [
   { icon: FileCode2, label: "Documenter", href: "/app/document" },
@@ -28,12 +30,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 border-r border-zinc-800/60 bg-zinc-950/80 flex flex-col">
-        <div className="p-5 border-b border-zinc-800/60">
+      <aside className="w-64 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)] flex flex-col">
+        <div className="p-5 border-b border-[var(--color-border)]">
           <Link href="/" className="flex items-center gap-2 group">
-            <ArrowLeft className="w-4 h-4 text-zinc-600 group-hover:text-emerald-500 transition-colors" />
+            <ArrowLeft className="w-4 h-4 text-[var(--color-text-secondary)] group-hover:text-emerald-500 transition-colors" />
             <Terminal className="w-5 h-5 text-emerald-500" />
-            <span className="font-mono font-bold text-zinc-100">
+            <span className="font-mono font-bold text-[var(--color-text-primary)]">
               RepoDoc<span className="text-emerald-500">AI</span>
             </span>
           </Link>
@@ -48,7 +50,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-mono transition-all duration-200 ${
                   active
                     ? "bg-emerald-600/10 text-emerald-400 border border-emerald-800/40"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/60"
+                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-hover)]"
                 }`}
               >
                 <item.icon className="w-4 h-4" />
@@ -57,15 +59,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-zinc-800/60">
-          <div className="text-xs font-mono text-zinc-700">
+        <div className="p-4 border-t border-[var(--color-border)] space-y-2">
+          <ThemeToggle />
+          <div className="text-xs font-mono text-[var(--color-text-tertiary)]">
             Powered by AI
           </div>
         </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto">
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </main>
     </div>
   );
 }
