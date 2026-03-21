@@ -13,9 +13,11 @@ import {
   Terminal,
   ArrowLeft,
   Star,
+  Settings,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import OnboardingTour from "@/components/OnboardingTour";
 import { getFavoritesCount } from "@/components/FavoriteButton";
 
 const navItems = [
@@ -25,6 +27,7 @@ const navItems = [
   { icon: Network, label: "Architecture", href: "/app/architecture" },
   { icon: GitCommitHorizontal, label: "Changelog", href: "/app/changelog" },
   { icon: ArrowRightLeft, label: "Migration", href: "/app/migration" },
+  { icon: Settings, label: "Settings", href: "/app/settings" },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +43,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <OnboardingTour />
       {/* Sidebar */}
       <aside className="w-64 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar)] flex flex-col">
         <div className="p-5 border-b border-[var(--color-border)]">
