@@ -19,6 +19,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import OnboardingTour from "@/components/OnboardingTour";
 import { getFavoritesCount } from "@/components/FavoriteButton";
+import { UserMenu } from "@/components/AuthGate";
 
 const navItems = [
   { icon: FileCode2, label: "Documenter", href: "/app/document" },
@@ -85,6 +86,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </nav>
         <div className="p-4 border-t border-[var(--color-border)] space-y-2">
+          <UserMenu />
           <ThemeToggle />
           <div className="text-xs font-mono text-[var(--color-text-tertiary)]">
             Powered by AI
