@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { incrementUsage } from "@/lib/usage";
 import { motion } from "framer-motion";
 import { Copy, Check, Loader2, Sparkles, RotateCcw } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -54,6 +53,14 @@ export default function DocTool({
         }),
       });
 
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
+
       if (!res.ok) throw new Error("Generation failed");
 
       const reader = res.body?.getReader();
@@ -72,7 +79,6 @@ export default function DocTool({
           }
         }
       }
-      incrementUsage();
       addToast({ title: `${title} generated`, variant: "success" });
     } catch {
       setOutput("Error generating documentation. Please try again.");

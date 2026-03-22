@@ -1,3 +1,6 @@
+import { NextRequest } from "next/server";
+import { checkAndIncrementUsage, isAuthenticated } from "@/lib/rate-limit";
+
 const SYSTEM_PROMPTS: Record<string, string> = {
   document: `You are an expert code documenter. Given source code, add comprehensive JSDoc/docstring comments to every function, class, method, and significant block. Include:
 - @param with types and descriptions
@@ -63,88 +66,117 @@ Generate a professional, readable changelog.`,
 Format as clear, actionable markdown documentation.`,
 };
 
-export async function POST(request: Request) {
-  const { mode, input, secondInput } = await request.json();
+export async function POST(request: NextRequest) {
+  try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || request.headers.get("x-real-ip")
+      || "unknown";
 
-  const systemPrompt = SYSTEM_PROMPTS[mode] || SYSTEM_PROMPTS.document;
+    const authed = await isAuthenticated(ip);
 
-  let userMessage = input;
-  if (mode === "migration" && secondInput) {
-    userMessage = `OLD CODE:\n${input}\n\nNEW CODE:\n${secondInput}`;
-  }
+    if (!authed) {
+      const { allowed, count } = await checkAndIncrementUsage(ip);
+      if (!allowed) {
+        return Response.json(
+          {
+            error: "FREE_LIMIT_REACHED",
+            message: `Free trial complete. You've used ${count} of 3 free generations. Sign in with Google to continue.`,
+            count,
+            remaining: 0,
+          },
+          { status: 429 }
+        );
+      }
+    }
 
-  const response = await fetch("https://sai.sharedllm.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "gpt-oss:120b",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userMessage },
-      ],
-      stream: true,
-      max_tokens: 4096,
-      temperature: 0.3,
-    }),
-  });
+    const { mode, input, secondInput } = await request.json();
 
-  if (!response.ok) {
-    return Response.json(
-      { error: "Failed to generate documentation" },
-      { status: 500 }
-    );
-  }
+    const systemPrompt = SYSTEM_PROMPTS[mode] || SYSTEM_PROMPTS.document;
 
-  const reader = response.body?.getReader();
-  if (!reader) {
-    return Response.json({ error: "No response body" }, { status: 500 });
-  }
+    let userMessage = input;
+    if (mode === "migration" && secondInput) {
+      userMessage = `OLD CODE:\n${input}\n\nNEW CODE:\n${secondInput}`;
+    }
 
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
+    const response = await fetch("https://sai.sharedllm.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-oss:120b",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
+        ],
+        stream: true,
+        max_tokens: 4096,
+        temperature: 0.3,
+      }),
+    });
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+    if (!response.ok) {
+      return Response.json(
+        { error: "Failed to generate documentation" },
+        { status: 500 }
+      );
+    }
 
-          const text = decoder.decode(value, { stream: true });
-          const lines = text.split("\n");
+    const reader = response.body?.getReader();
+    if (!reader) {
+      return Response.json({ error: "No response body" }, { status: 500 });
+    }
 
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6).trim();
-              if (data === "[DONE]") continue;
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
 
-              try {
-                const json = JSON.parse(data);
-                const content = json.choices?.[0]?.delta?.content;
-                if (content) {
-                  controller.enqueue(encoder.encode(content));
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const text = decoder.decode(value, { stream: true });
+            const lines = text.split("\n");
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6).trim();
+                if (data === "[DONE]") continue;
+
+                try {
+                  const json = JSON.parse(data);
+                  const content = json.choices?.[0]?.delta?.content;
+                  if (content) {
+                    controller.enqueue(encoder.encode(content));
+                  }
+                } catch {
+                  // skip malformed chunks
                 }
-              } catch {
-                // skip malformed chunks
               }
             }
           }
+        } catch {
+          // stream ended
+        } finally {
+          controller.close();
         }
-      } catch {
-        // stream ended
-      } finally {
-        controller.close();
-      }
-    },
-  });
+      },
+    });
 
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Transfer-Encoding": "chunked",
-      "Cache-Control": "no-cache",
-    },
-  });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Transfer-Encoding": "chunked",
+        "Cache-Control": "no-cache",
+      },
+    });
+  } catch (error) {
+    console.error("Generate API error:", error);
+    return Response.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
