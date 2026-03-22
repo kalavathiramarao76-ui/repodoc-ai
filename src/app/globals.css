@@ -140,6 +140,23 @@ body {
 .doc-output li { margin: 0.25rem 0; }
 .doc-output blockquote { border-left: 3px solid #10b981; padding-left: 1rem; color: #a1a1aa; margin: 0.75rem 0; }
 
+/* Toast slide-in */
+@keyframes toast-slide-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Focus-visible outline for accessibility */
+*:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+textarea:focus-visible,
+input:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 0px;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

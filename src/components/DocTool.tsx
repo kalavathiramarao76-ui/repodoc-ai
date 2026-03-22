@@ -6,6 +6,7 @@ import { Copy, Check, Loader2, Sparkles, RotateCcw } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 interface DocToolProps {
   title: string;
@@ -34,6 +35,7 @@ export default function DocTool({
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
+  const { addToast } = useToast();
 
   const handleGenerate = async () => {
     if (!input.trim()) return;
@@ -69,8 +71,10 @@ export default function DocTool({
           }
         }
       }
+      addToast({ title: `${title} generated`, variant: "success" });
     } catch {
       setOutput("Error generating documentation. Please try again.");
+      addToast({ title: "Generation failed", description: "Please try again", variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -79,6 +83,7 @@ export default function DocTool({
   const handleCopy = () => {
     navigator.clipboard.writeText(output);
     setCopied(true);
+    addToast({ title: "Copied to clipboard", variant: "info" });
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -124,6 +129,7 @@ export default function DocTool({
             </div>
             <button
               onClick={handleReset}
+              aria-label="Clear inputs and output"
               className="text-xs text-zinc-600 hover:text-zinc-400 font-mono flex items-center gap-1 transition-colors"
             >
               <RotateCcw className="w-3 h-3" />
@@ -135,6 +141,7 @@ export default function DocTool({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={placeholder}
+            aria-label="Code input"
             className={`code-textarea flex-1 rounded-xl p-4 w-full ${
               hasSecondInput ? "min-h-[180px]" : "min-h-[300px]"
             }`}
@@ -151,6 +158,7 @@ export default function DocTool({
                 value={secondInput}
                 onChange={(e) => setSecondInput(e.target.value)}
                 placeholder={secondaryPlaceholder}
+                aria-label={secondaryLabel || "Secondary input"}
                 className="code-textarea flex-1 rounded-xl p-4 w-full min-h-[180px]"
               />
             </>
@@ -159,6 +167,7 @@ export default function DocTool({
           <button
             onClick={handleGenerate}
             disabled={loading || !input.trim()}
+            aria-label={loading ? "Generating documentation" : "Generate documentation"}
             className="mt-3 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white font-semibold font-mono text-sm flex items-center justify-center gap-2 transition-all duration-200 glow-emerald disabled:shadow-none"
           >
             {loading ? (
@@ -199,6 +208,7 @@ export default function DocTool({
                 <ExportMenu content={output} title={`${title} — RepoDoc AI Report`} />
                 <button
                   onClick={handleCopy}
+                  aria-label="Copy output to clipboard"
                   className="text-xs text-zinc-600 hover:text-emerald-400 font-mono flex items-center gap-1 transition-colors ml-1"
                 >
                   {copied ? (
