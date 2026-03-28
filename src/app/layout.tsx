@@ -21,8 +21,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://repodoc-ai.vercel.app"),
-  title: "RepoDoc AI — Auto-Generate Code Documentation",
+  metadataBase: new URL("https://codescribe.aisurgent.dev"),
+  title: "CodeScribe — Auto-Generate Code Documentation",
   description:
     "Generate JSDoc, README, API docs, architecture explanations, changelogs, and migration guides from your code.",
   robots: {
@@ -33,17 +33,17 @@ export const metadata: Metadata = {
     "max-video-preview": -1,
   },
   openGraph: {
-    title: "RepoDoc AI — Auto-Generate Code Documentation",
+    title: "CodeScribe — Auto-Generate Code Documentation",
     description:
       "Generate JSDoc, README, API docs, architecture explanations, changelogs, and migration guides from your code.",
-    url: "https://repodoc-ai.vercel.app",
-    siteName: "RepoDoc AI",
+    url: "https://codescribe.aisurgent.dev",
+    siteName: "CodeScribe",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "RepoDoc AI — Auto-Generate Code Documentation",
+        alt: "CodeScribe — Auto-Generate Code Documentation",
       },
     ],
     locale: "en_US",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RepoDoc AI — Auto-Generate Code Documentation",
+    title: "CodeScribe — Auto-Generate Code Documentation",
     description:
       "Generate JSDoc, README, API docs, architecture explanations, changelogs, and migration guides from your code.",
     images: ["/og-image.png"],
@@ -70,6 +70,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('repodoc-theme')||'dark';if(t==='system'){t=window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`,
@@ -81,8 +82,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "SoftwareApplication",
-              name: "RepoDoc AI",
-              url: "https://repodoc-ai.vercel.app",
+              name: "CodeScribe",
+              url: "https://codescribe.aisurgent.dev",
               applicationCategory: "DeveloperApplication",
               operatingSystem: "Web",
               description:

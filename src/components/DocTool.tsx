@@ -213,7 +213,7 @@ export default function DocTool({
                   itemLabel={title}
                   size="sm"
                 />
-                <ExportMenu content={output} title={`${title} — RepoDoc AI Report`} />
+                <ExportMenu content={output} title={`${title} — CodeScribe Report`} />
                 <button
                   onClick={handleCopy}
                   aria-label="Copy output to clipboard"

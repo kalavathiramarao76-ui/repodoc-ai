@@ -7,7 +7,7 @@ const STORAGE_KEY = "repodoc-onboarding-done";
 
 const steps = [
   {
-    title: "Welcome to RepoDoc AI",
+    title: "Welcome to CodeScribe",
     description:
       "Your AI-powered documentation engine. Generate READMEs, API docs, architecture diagrams, changelogs, and migration guides from code.",
     icon: <Sparkles className="w-8 h-8" />,

@@ -223,7 +223,7 @@ export default function LandingPage() {
         <div className="flex justify-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-800 bg-zinc-950/80 text-sm font-mono text-zinc-400">
             <Terminal className="w-4 h-4 text-emerald-500" />
-            <span>repodoc-ai</span>
+            <span>codescribe</span>
             <span className="text-emerald-400">v1.0</span>
             <span className="w-2 h-4 bg-emerald-500 cursor-blink" />
           </div>

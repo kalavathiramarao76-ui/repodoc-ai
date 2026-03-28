@@ -8,7 +8,7 @@ interface ExportMenuProps {
   title?: string;
 }
 
-export default function ExportMenu({ content, title = "RepoDoc AI Report" }: ExportMenuProps) {
+export default function ExportMenu({ content, title = "CodeScribe Report" }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);

@@ -41,7 +41,7 @@ export default function SettingsPage() {
   };
 
   const clearData = () => {
-    if (!confirm("Clear all RepoDoc AI local data? This includes favorites and settings. This cannot be undone.")) return;
+    if (!confirm("Clear all CodeScribe local data? This includes favorites and settings. This cannot be undone.")) return;
     try {
       const keys = Object.keys(localStorage).filter((k) => k.startsWith("repodoc"));
       keys.forEach((k) => localStorage.removeItem(k));
@@ -64,7 +64,7 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-zinc-100 font-mono">Settings</h1>
       </div>
       <p className="text-zinc-500 text-sm font-mono mb-10">
-        Configure your RepoDoc AI workspace.
+        Configure your CodeScribe workspace.
       </p>
 
       <div className="space-y-8">

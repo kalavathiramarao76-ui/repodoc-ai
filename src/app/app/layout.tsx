@@ -52,7 +52,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <ArrowLeft className="w-4 h-4 text-[var(--color-text-secondary)] group-hover:text-emerald-500 transition-colors" />
             <Terminal className="w-5 h-5 text-emerald-500" />
             <span className="font-mono font-bold text-[var(--color-text-primary)]">
-              RepoDoc<span className="text-emerald-500">AI</span>
+              CodeScribe<span className="text-emerald-500">AI</span>
             </span>
           </Link>
         </div>
