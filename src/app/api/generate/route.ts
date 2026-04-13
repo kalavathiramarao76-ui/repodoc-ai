@@ -98,17 +98,17 @@ export async function POST(request: NextRequest) {
       userMessage = `OLD CODE:\n${input}\n\nNEW CODE:\n${secondInput}`;
     }
 
-    const apiKey = process.env.ZAI_API_KEY;
+    const apiKey = process.env.OLLAMA_API_KEY;
     if (!apiKey) {
       return Response.json(
-        { error: "Server misconfigured: ZAI_API_KEY is not set" },
+        { error: "Server misconfigured: OLLAMA_API_KEY is not set" },
         { status: 500 }
       );
     }
-    const baseUrl = process.env.ZAI_BASE_URL || "https://api.z.ai/api/paas/v4";
-    const model = process.env.ZAI_MODEL || "glm-4.6";
+    const baseUrl = process.env.OLLAMA_BASE_URL || "https://ollama.com";
+    const model = process.env.OLLAMA_MODEL || "glm-5.1";
 
-    const response = await fetch(`${baseUrl}/chat/completions`, {
+    const response = await fetch(`${baseUrl}/api/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,15 +121,23 @@ export async function POST(request: NextRequest) {
           { role: "user", content: userMessage },
         ],
         stream: true,
-        max_tokens: 4096,
-        temperature: 0.3,
+        options: {
+          temperature: 0.3,
+          num_predict: 4096,
+        },
       }),
     });
 
     if (!response.ok) {
+      const upstreamText = await response.text().catch(() => "");
+      console.error("Ollama upstream error:", response.status, upstreamText);
       return Response.json(
-        { error: "Failed to generate documentation" },
-        { status: 500 }
+        {
+          error: "Upstream LLM error",
+          status: response.status,
+          detail: upstreamText.slice(0, 500),
+        },
+        { status: 502 }
       );
     }
 
@@ -143,29 +151,36 @@ export async function POST(request: NextRequest) {
 
     const stream = new ReadableStream({
       async start(controller) {
+        let buffer = "";
         try {
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const text = decoder.decode(value, { stream: true });
-            const lines = text.split("\n");
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() ?? "";
 
             for (const line of lines) {
-              if (line.startsWith("data: ")) {
-                const data = line.slice(6).trim();
-                if (data === "[DONE]") continue;
-
-                try {
-                  const json = JSON.parse(data);
-                  const content = json.choices?.[0]?.delta?.content;
-                  if (content) {
-                    controller.enqueue(encoder.encode(content));
-                  }
-                } catch {
-                  // skip malformed chunks
-                }
+              const trimmed = line.trim();
+              if (!trimmed) continue;
+              try {
+                const json = JSON.parse(trimmed);
+                const content = json.message?.content;
+                if (content) controller.enqueue(encoder.encode(content));
+                if (json.done) break;
+              } catch {
+                // skip malformed chunks
               }
+            }
+          }
+          if (buffer.trim()) {
+            try {
+              const json = JSON.parse(buffer.trim());
+              const content = json.message?.content;
+              if (content) controller.enqueue(encoder.encode(content));
+            } catch {
+              // ignore trailing noise
             }
           }
         } catch {
