@@ -98,13 +98,24 @@ export async function POST(request: NextRequest) {
       userMessage = `OLD CODE:\n${input}\n\nNEW CODE:\n${secondInput}`;
     }
 
-    const response = await fetch("https://sai.sharedllm.com/v1/chat/completions", {
+    const apiKey = process.env.ZAI_API_KEY;
+    if (!apiKey) {
+      return Response.json(
+        { error: "Server misconfigured: ZAI_API_KEY is not set" },
+        { status: 500 }
+      );
+    }
+    const baseUrl = process.env.ZAI_BASE_URL || "https://api.z.ai/api/paas/v4";
+    const model = process.env.ZAI_MODEL || "glm-4.6";
+
+    const response = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-oss:120b",
+        model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },
